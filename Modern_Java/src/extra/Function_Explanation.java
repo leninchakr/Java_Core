@@ -22,12 +22,12 @@ public class Function_Explanation {
 		/**
 		 * Sample Employee objects
 		 */
-		Employee_New emp_1 = new Employee_New();
+		Employee emp_1 = new Employee();
 		emp_1.empId = "123";
 		emp_1.age = 27;
 		emp_1.salary = 1530.0;
 
-		Employee_New emp_2 = new Employee_New();
+		Employee emp_2 = new Employee();
 		emp_2.empId = "456";
 		emp_2.age = 18;
 		emp_2.salary = 1500.0;
@@ -42,7 +42,7 @@ public class Function_Explanation {
 		 * Purpose:
 		 *      Extracts age from Employee object
 		 */
-		Function<Employee_New, Integer> my_map_expanded = (Employee_New o) -> (Integer) o.age;
+		Function<Employee, Integer> my_map_expanded = (Employee o) -> (Integer) o.age;
 
 		/**
 		 * Type inference example:
@@ -51,7 +51,7 @@ public class Function_Explanation {
 		 * from the left-hand side declaration.
 		 */
 		// Important : .apply() method's definition is said here
-		Function<Employee_New, Integer> my_map_auto_type_match = (o) -> o.age;
+		Function<Employee, Integer> my_map_auto_type_match = (o) -> o.age;
 
 		/**
 		 * ================================
@@ -90,7 +90,7 @@ public class Function_Explanation {
 		 *      Employee_New → Double → Double
 		 *      (salary × 2) → (reduce 10%)
 		 */
-		Function<Employee_New, Double> double_the_salary = (o) -> o.salary * 2.0;
+		Function<Employee, Double> double_the_salary = (o) -> o.salary * 2.0;
 
 		Function<Double, Double> deduct_10_percent = (o) -> o * 0.9;
 
@@ -114,7 +114,7 @@ public class Function_Explanation {
 		 *      Final Double result
 		 */
 		// Important : It is 'instance' method-call
-		Function<Employee_New, Double> final_salary_compose = deduct_10_percent
+		Function<Employee, Double> final_salary_compose = deduct_10_percent
 				.compose(double_the_salary);
 
 		/**
@@ -172,7 +172,7 @@ public class Function_Explanation {
 		 *      (salary × 2) → (reduce 10%)
 		 */
 		// Important : It is 'instance' method-call
-		Function<Employee_New, Double> final_salary_andThen = double_the_salary
+		Function<Employee, Double> final_salary_andThen = double_the_salary
 				.andThen(deduct_10_percent);
 
 		/**
@@ -212,7 +212,7 @@ public class Function_Explanation {
 		 * - 'Static' method. So access by @Interface name-itself.
 		 * 
 		 */
-		Function<Employee_New, Employee_New> my_id_func = Function
+		Function<Employee, Employee> my_id_func = Function
 				.identity();
 
 		System.out
@@ -222,14 +222,4 @@ public class Function_Explanation {
 				.println("Normal Object 			: " + emp_1);
 
 	}
-}
-
-/**
- * Simple POJO (Plain Old Java Object)
- */
-class Employee_New {
-
-	public String empId;
-	public Integer age;
-	public Double salary;
 }
