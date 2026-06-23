@@ -75,34 +75,10 @@ public class Comparator_Methods {
 		 * - So there is NO natural ordering defined
 		 * - We must explicitly define sorting logic using Comparator
 		 */
-		Student s1 = new Student();
-		s1.studId = "S101";
-		s1.studAge = 20;
-		s1.studDept = "CSE";
+		Student stud_data = new Student();
 
-		Student s2 = new Student();
-		s2.studId = "S102";
-		s2.studAge = 22;
-		s2.studDept = "ECE";
-
-		Student s3 = new Student();
-		s3.studId = "S103";
-		s3.studAge = 19;
-		s3.studDept = "MECH";
-
-		Student s4 = new Student();
-		s4.studId = "S104";
-		s4.studAge = 21;
-		s4.studDept = "CSE";
-
-		Student s5 = new Student();
-		s5.studId = "S105";
-		s5.studAge = 23;
-		s5.studDept = "EEE";
-
-		// Creating a mutable list from immutable List.of()
-		List<Student> students_list = new ArrayList<>(List
-				.of(s1, s2, s3, s4, s5));
+		List<Student> students_list = stud_data
+				.getAllStudents();
 
 		/**
 		 * =========================================================
@@ -112,38 +88,10 @@ public class Comparator_Methods {
 		 * - So it already defines NATURAL ORDER (by staffAge)
 		 * - No need to pass explicit Comparator logic
 		 */
-		Staff st1 = new Staff();
-		st1.staffId = "ST101";
-		st1.staffAge = 45;
-		st1.staffDept = "HR";
-		st1.staffSalary = 12.65;
+		Staff staff_data = new Staff();
 
-		Staff st2 = new Staff();
-		st2.staffId = "ST102";
-		st2.staffAge = 30;
-		st2.staffDept = "Finance";
-		st2.staffSalary = 10.65;
-
-		Staff st3 = new Staff();
-		st3.staffId = "ST103";
-		st3.staffAge = 30;
-		st3.staffDept = "IT";
-		st3.staffSalary = 14.65;
-
-		Staff st4 = new Staff();
-		st4.staffId = "ST104";
-		st4.staffAge = 28;
-		st4.staffDept = "Admin";
-		st4.staffSalary = 9.65;
-
-		Staff st5 = new Staff();
-		st5.staffId = "ST105";
-		st5.staffAge = 50;
-		st5.staffDept = "Operations";
-		st5.staffSalary = 11.65;
-
-		List<Staff> staffs_list = new ArrayList<>(List
-				.of(st1, st2, st3, st4, st5));
+		List<Staff> staffs_list = staff_data
+				.getAllStaffs();
 
 		/****************************************************************/
 

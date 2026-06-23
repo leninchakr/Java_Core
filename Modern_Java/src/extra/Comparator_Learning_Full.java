@@ -9,15 +9,10 @@ public class Comparator_Learning_Full {
 
 	public static void main(String[] args) {
 
-		Employee emp_1 = new Employee();
-		emp_1.empId = "Lenin";
-		emp_1.age = 27;
-		emp_1.salary = 1530.0;
+		Employee emp_data = new Employee();
 
-		Employee emp_2 = new Employee();
-		emp_2.empId = "Apple";
-		emp_2.age = 18;
-		emp_2.salary = 1500.0;
+		List<Employee> employees = emp_data
+				.getAllEmployees();
 
 		/**
 		 * Logic for Comparing Two-Objects
@@ -107,12 +102,6 @@ public class Comparator_Learning_Full {
 		/**
 		 * HOW TO USE THE COMPARATOR
 		 */
-		List<Employee> employees = new ArrayList<>();
-		employees
-				.add(emp_1);
-		employees
-				.add(emp_2);
-
 		employees
 				.sort(comparator_for_SORT);
 
