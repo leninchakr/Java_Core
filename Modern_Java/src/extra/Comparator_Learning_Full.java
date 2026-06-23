@@ -20,8 +20,8 @@ public class Comparator_Learning_Full {
 		emp_2.salary = 1500.0;
 
 		/**
-		 * Simple custom comparator using lambda
-		 * Compares Employees based on age
+		 * Logic for Comparing Two-Objects
+		 * 
 		 */
 		Comparator<Employee> my_custom_comparator = (o1, o2) -> Integer
 				.compare(o1.age, o2.age);
@@ -51,7 +51,7 @@ public class Comparator_Learning_Full {
 		 * Key Extractor using lambda
 		 * Employee → salary
 		 */
-		Function<Employee, Double> keyExtractor = (o) -> o.salary;
+		Function<Employee, Double> keyExtractor_Varaible_to_Compare = (o) -> o.salary;
 
 		/**
 		 * Key Extractor using Method Reference (cleaner form)
@@ -62,7 +62,7 @@ public class Comparator_Learning_Full {
 		 * Key Comparator for extracted values (Double)
 		 * Defines how two salary values are compared
 		 */
-		Comparator<Double> keyComparator = (o1, o2) -> Double
+		Comparator<Double> keyComparator_Logic = (o1, o2) -> Double
 				.compare(o1, o2);
 
 		/**
@@ -84,8 +84,11 @@ public class Comparator_Learning_Full {
 		 *         keyExtractor.apply(e2)
 		 *     )
 		 */
-		Comparator<Employee> my_comparing_comparator = Comparator
-				.comparing(keyExtractor, keyComparator);
+		/**
+		 * Final Comparator (used with .sort() method) "Two Objects" + With Generic-Custom-Comparator Approach
+		 */
+		Comparator<Employee> comparator_for_SORT = Comparator
+				.comparing(keyExtractor_Varaible_to_Compare, keyComparator_Logic);
 
 		/**
 		 * NOTE:
@@ -98,7 +101,7 @@ public class Comparator_Learning_Full {
 		/**
 		 * Practical Approach
 		 */
-		Comparator<Employee> my_comparing_comparator_practical = Comparator
+		Comparator<Employee> comparator_for_SORT_Practical = Comparator
 				.comparing(Employee::getSalary, Double::compare);
 
 		/**
@@ -111,7 +114,7 @@ public class Comparator_Learning_Full {
 				.add(emp_2);
 
 		employees
-				.sort(my_comparing_comparator);
+				.sort(comparator_for_SORT);
 
 		/**
 		 * HOW SORTING WORKS IN THIS CODE (USING keyExtractor + keyComparator)

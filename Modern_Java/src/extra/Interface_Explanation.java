@@ -7,7 +7,7 @@ public class Interface_Explanation {
 		/**
 		 * 1. Create Object from Lamda-Expression
 		 */
-		Sample_Interface<Integer> sample_inter_obj_lambda = (a) -> a * a;
+		Interface_All_Method_Types<Integer> sample_inter_obj_lambda = (a) -> a * a;
 
 		System.out
 				.println("Square of 7 is " + sample_inter_obj_lambda
@@ -17,7 +17,7 @@ public class Interface_Explanation {
 		 * 2. Calling 'Static' Methods 
 		 */
 		// Valid ! :)
-		Sample_Interface
+		Interface_All_Method_Types
 				.one_time_implemented();
 
 		// In-valid! :(
@@ -31,7 +31,7 @@ public class Interface_Explanation {
 		 * - Lambda Expression cannot be used
 		 * - Use AIC instead
 		 */
-		Sample_Interface<Integer> sample_inter_obj_aic = new Sample_Interface<Integer>() {
+		Interface_All_Method_Types<Integer> sample_inter_obj_aic = new Interface_All_Method_Types<Integer>() {
 
 			/**
 			 * Abstract method implementation
@@ -57,7 +57,7 @@ public class Interface_Explanation {
 		 * 4. Calling 'Default' method using @Interface name. Not using Object!
 		 * - Not allwoed
 		 */
-		Sample_Interface
+		Interface_All_Method_Types
 				.any_time_implemented_by_class();
 
 		/**

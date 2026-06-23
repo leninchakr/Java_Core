@@ -1,7 +1,7 @@
 package extra;
 
 @FunctionalInterface
-public interface Sample_Interface<T> {
+public interface Interface_All_Method_Types<T> {
 
 	/*
 	 * Type 1 : Abstract method
