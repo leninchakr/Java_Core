@@ -1,14 +1,19 @@
 package extra;
 
-import java.security.KeyStore.Entry;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
- * @BiConsumer is most useful when you genuinely have two independent inputs
+ * @BiConsumer 
+ * 	
+ * -	It is most useful when you genuinely have two independent inputs
+ * 
+ * User Cases
+ * 
+ * 	-	It is most used  in Processing a Map (Most Common)
+ * 	-	Logging Changes
  */
-public class BiConsumer_Learnin_Map {
+public class BiConsumer_Map {
 
 	/**
 	 * Inputs

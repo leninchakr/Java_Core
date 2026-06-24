@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
-public class Comparator_Learning_Full {
+public class Comparator_Full {
 
 	public static void main(String[] args) {
 

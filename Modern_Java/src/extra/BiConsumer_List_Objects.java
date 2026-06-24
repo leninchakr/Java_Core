@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import section_7.data.Student;
 import section_7.data.StudentDataBase;
 
-public class BiConsumer_Learning_List_Objects {
+public class BiConsumer_List_Objects {
 
 	public static List<Student> studentsList = StudentDataBase
 			.getAllStudents();

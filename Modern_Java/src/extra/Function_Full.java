@@ -15,7 +15,7 @@ import java.util.function.Function;
  * Common analogy:
  *      Stream.map()
  */
-public class Function_Explanation {
+public class Function_Full {
 
 	public static void main(String[] args) {
 

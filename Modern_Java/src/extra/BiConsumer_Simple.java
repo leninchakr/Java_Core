@@ -14,7 +14,7 @@ import java.util.function.BiConsumer;
  * 			-	Cascading Consuming
  * 
  */
-public class BiConsumer_Learning_Simple {
+public class BiConsumer_Simple {
 
 	public static void main(String[] args) {
 

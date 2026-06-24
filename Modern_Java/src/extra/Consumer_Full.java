@@ -18,7 +18,7 @@ import section_7.data.StudentDataBase;
  * 			-	Cascading Consuming
  * 
  */
-public class Consumer_Learning {
+public class Consumer_Full {
 
 	public static List<Student> studentsList = StudentDataBase
 			.getAllStudents();

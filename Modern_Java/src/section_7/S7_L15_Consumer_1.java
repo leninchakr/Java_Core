@@ -9,7 +9,7 @@ import section_7.data.StudentDataBase;
 /**
  * Real-Time Usage of @Consumer<T>
  */
-public class S7_L15_Consumer_FI {
+public class S7_L15_Consumer_1 {
 
 	public static void main(String[] args) {
 

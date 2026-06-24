@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 
 import extra.Employee;
 
-public class S7_L14_Consumer_FI {
+public class S7_L14_Consumer {
 
 	public static void main(String[] args) {
 
