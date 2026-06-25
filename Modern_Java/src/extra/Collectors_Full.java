@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -17,44 +18,93 @@ import section_7.data.Student;
 import section_7.data.StudentDataBase;
 
 /**
- * What it is:
- * 
- * 		-	It is helper-class to collect/consolidate data
- * 		-	It has many @static methods	
- * 		-	It is @final class
- * 		-	It doesn't depend on any @Interface / @Class	
- * 
- * Why we need it:
- * 
- * 		-	Mostly used with @.collect( @Collectors )
- * 		-	To consolidate data in some-form
- * 		-	Eg:
- * 				-	@List
- * 				-	@Set
- * 				-	@Map
- * 				-	@String
- * 				-	@Number
- * 
- * Methods:
- * 		1.	.toList()
- * 				-	List<input_type> = .collect(Collectors.toList())
- * 				-	The returned @List is @Immutable by default.
- * 		2.	.toSet()
- * 				-	Same as .toList()
- * 				-	But won't add a value, if it already exits 
- * 
- * Methods : 8 major categories
- * 
- * 		1.	Collection Creation						
- * 				->	toList(), toSet(), toCollection()
- * 		2.	Map Creation
- * 				->	toMap(), toCollectionMap()
- * 		3.	Grouping
- * 		4.	Partitioning
- * 		5.	Aggregation / Statistics
- * 		6.	String Joining
- * 		7.	Reduction
- * 		8.	Downstream / Transformation Collectors
+ * ========================= COLLECTORS OVERVIEW =========================
+ *
+ * WHAT IS Collectors?
+ * --------------------
+ * Collectors is a utility (helper) class in Java Stream API that provides
+ * predefined implementations of the Collector interface.
+ *
+ * It is used to accumulate stream elements into a final data structure.
+ *
+ * ----------------------------------------------------------------------
+ * KEY CHARACTERISTICS:
+ *
+ * - Utility class with only static methods
+ * - Cannot be instantiated
+ * - Provides reusable Collector implementations
+ * - Works with Stream.collect()
+ *
+ * ----------------------------------------------------------------------
+ * WHY DO WE NEED IT?
+ *
+ * Collectors are used to transform and consolidate Stream data into
+ * meaningful results.
+ *
+ * Common output forms include:
+ *
+ *      - List
+ *      - Set
+ *      - Map
+ *      - String
+ *      - Numeric results (count, average, sum, etc.)
+ *
+ * ----------------------------------------------------------------------
+ * MAJOR CATEGORIES OF COLLECTORS:
+ *
+ * 1. COLLECTION CREATION
+ *      - Convert Stream → Collection
+ *      - Examples:
+ *          toList()
+ *          toSet()
+ *          toCollection()
+ *
+ * 2. MAP CREATION
+ *      - Convert Stream → Map
+ *      - Examples:
+ *          toMap()
+ *          groupingBy()
+ *          partitioningBy()
+ *
+ * 3. GROUPING
+ *      - Classify elements into groups
+ *      - Example:
+ *          groupingBy()
+ *
+ * 4. PARTITIONING
+ *      - Split data into two groups (true/false)
+ *      - Example:
+ *          partitioningBy()
+ *
+ * 5. AGGREGATION / STATISTICS
+ *      - Perform numeric calculations
+ *      - Examples:
+ *          counting()
+ *          averagingDouble()
+ *          summingInt()
+ *          summarizingDouble()
+ *
+ * 6. STRING JOINING
+ *      - Combine elements into a single String
+ *      - Example:
+ *          joining()
+ *
+ * 7. REDUCTION
+ *      - Reduce stream into a single result
+ *      - Examples:
+ *          reducing()
+ *          maxBy()
+ *          minBy()
+ *
+ * 8. DOWNSTREAM / TRANSFORMATION COLLECTORS
+ *      - Used inside groupingBy / partitioningBy
+ *      - Transforms grouped values
+ *      - Examples:
+ *          mapping()
+ *          filtering()
+ *          collectingAndThen()
+ *
+ * ======================================================================
  */
 public class Collectors_Full {
 
@@ -92,8 +142,6 @@ public class Collectors_Full {
 		 * 	-	.toConcurrentMap()
 		 */
 		Map_Creation_methods();
-
-		groupingBy_method_object_stream();
 
 	}
 
@@ -256,6 +304,8 @@ public class Collectors_Full {
 	public static void Map_Creation_methods() {
 
 		toMap_method_object_stream();
+		groupingBy_method_object_stream();
+		partitioningBy_method_object_stream();
 	}
 
 	public static void toMap_method_object_stream() {
@@ -313,18 +363,75 @@ public class Collectors_Full {
 	public static void groupingBy_method_object_stream() {
 
 		/**
-		 * What is does:
-		 * 		-	Group based on F_Key
-		 * 		-	RT : Map< F_Key, List<T> >
-		 * 
-		 * 	Syntax: (6)
-		 * 		-	( @Function keyExtractor)
-		 * 		-	( @Function keyExtractor, @Supplier mapFactory, @Collector ds)
+		 * ========================= GROUPING IN STREAMS =========================
+		 *
+		 * groupingBy() is used to perform "classification-based aggregation".
+		 * It groups stream elements into buckets based on a classifier function.
+		 *
+		 * Concept:
+		 * --------
+		 * One-to-Many relationship:
+		 *      One key  →  Many values (grouped elements)
+		 *
+		 * -----------------------------------------------------------------------
+		 * GENERAL BEHAVIOR:
+		 *
+		 * Input   : Stream<T>
+		 * Process : Classify each element using Function<T, K>
+		 * Output  : Map<K, List<T>>   (default behavior)
+		 *
+		 * -----------------------------------------------------------------------
+		 * WHY MAP ALWAYS?
+		 *
+		 * Because grouping means:
+		 *      - Create buckets (keys)
+		 *      - Store matching elements in each bucket
+		 *
+		 * So the outer structure is ALWAYS a Map.
+		 *
+		 * -----------------------------------------------------------------------
+		 * groupBy OVERLOADS:
+		 *
+		 * 1. groupingBy(Function classifier)
+		 *      → Map<K, List<T>>
+		 *
+		 * 2. groupingBy(Function classifier, Collector downstream)
+		 *      → Map<K, D>   (D depends on downstream collector)
+		 *
+		 * 3. groupingBy(Function classifier, Supplier mapFactory, Collector downstream)
+		 *      → Custom Map implementation + Map<K, D>
 		 */
 
-		/**
-		 *  Type - 1:	( @Function keyExtractor)
-		 *  	-	Return Type : Map< F_Key, List<T> >
+		/*
+		 * -----------------------------------------------------------------------
+		 * TYPE - 1 (Basic grouping):
+		 *
+		 * Signature:
+		 *      groupingBy(Function<T, K>)
+		 *
+		 * Flow:
+		 *      Input  : List<T>
+		 *      Stream : Stream<T>
+		 *      Key    : Extracted using classifier Function<T, K>
+		 *      Value  : List<T> (original elements grouped together)
+		 *
+		 * Result:
+		 *      Map<K, List<T>>
+		 *
+		 * -----------------------------------------------------------------------
+		 * IMPORTANT RULE:
+		 *
+		 * - Key type (K) comes from classifier function
+		 * - Value type (T) is ALWAYS the original stream element type
+		 * - Unless a downstream collector is used
+		 *
+		 * -----------------------------------------------------------------------
+		 * KEY INSIGHT:
+		 *
+		 * groupingBy() does NOT transform elements by default.
+		 * It only groups them into lists.
+		 *
+		 * =======================================================================
 		 */
 		Function<Student, String> name_classifier_type_1 = o -> o
 				.getName();
@@ -339,21 +446,216 @@ public class Collectors_Full {
 		System.out
 				.println(groupBy_Name_type_1);
 
+		/*
+		 * ========================= GROUPING - TYPE 2 =========================
+		 *
+		 * Basic Idea:
+		 * -----------
+		 * To change the VALUE type of the resulting Map, we use a downstream collector.
+		 *
+		 * This allows transformation/aggregation of grouped elements.
+		 *
+		 * ----------------------------------------------------------------------
+		 * SIGNATURE:
+		 *
+		 * groupingBy(Function<T, K>, Collector<T, A, D>)
+		 *
+		 * ----------------------------------------------------------------------
+		 * PARAMETERS:
+		 *
+		 * 1. keyExtractor (Function<T, K>)
+		 *      - Extracts the grouping key
+		 *      - Determines how elements are grouped
+		 *
+		 * 2. downstream (Collector)
+		 *      - Defines what happens to grouped values
+		 *      - Transforms List<T> into another result type (D)
+		 *
+		 *      Examples:
+		 *          Collectors.counting()
+		 *          Collectors.averagingDouble()
+		 *          Collectors.mapping()
+		 *          Collectors.summarizingDouble()
+		 *          Collectors.maxBy()
+		 *
+		 *      NOTE:
+		 *          In most real-world cases, downstream collectors come from
+		 *          Collectors.* utility class.
+		 *
+		 * ----------------------------------------------------------------------
+		 * FLOW:
+		 *
+		 * Input   : List<T>
+		 * Stream  : Stream<T>
+		 * Step 1  : Group elements using keyExtractor → K
+		 * Step 2  : Apply downstream collector on each group
+		 *
+		 * ----------------------------------------------------------------------
+		 * RESULT:
+		 *
+		 * Map<K, D>
+		 *
+		 * where:
+		 *      K → Type of grouping key
+		 *      D → Result produced by downstream collector
+		 *
+		 * ----------------------------------------------------------------------
+		 * IMPORTANT INSIGHT:
+		 *
+		 * - groupingBy() always creates a Map
+		 * - Key is defined by classifier function
+		 * - Value type is controlled by downstream collector
+		 * - Without downstream, value defaults to List<T>
+		 *
+		 * ======================================================================
+		 */
+
 		/**
-		 *  Type - 2:
-		 *  
-		 *  	-	( @Function keyExtractor, @Supplier mapFactory, @Collector Interface ds)
-		 *  
-		 *  		:	keyExtractor
-		 *  			-	Key ( @Function) for key-selection
-		 *  		:	mapFactory 
-		 * 				-	@Supplier decides the Map implementation
-		 * 				-	Eg:
-		 * 					HashMap / TreeMap / LinkedHashMap / ConcurrentMap
-		 * 			:	ds
-		 * 				-	What happens to the Grouped-Values
-		 * 				-	Eg:
-		 * 					count/ average/ max/ mapping/ summarizing	
+		 * Step 1: Get Key
+		 */
+		Function<Student, String> groupBy_Name_type_2 = o -> o
+				.getName();
+
+		/*
+		 * ========================= DOWNSTREAM COLLECTORS =========================
+		 *
+		 * Step 2: Downstream Collector (used in advanced grouping/collecting)
+		 *
+		 * ------------------------------------------------------------------------
+		 * PURPOSE:
+		 *
+		 * - Defines how grouped elements are processed after classification
+		 * - Transforms the default List<T> into another result type (D)
+		 *
+		 * ------------------------------------------------------------------------
+		 * GENERIC STRUCTURE:
+		 *
+		 * Collector<T, A, R>
+		 *
+		 * where:
+		 *      T → Input element type (Stream element type)
+		 *      A → Accumulator type (internal working memory)
+		 *      R → Final result type
+		 *
+		 * ------------------------------------------------------------------------
+		 * IMPORTANT INSIGHT:
+		 *
+		 * - In most real-world and built-in collectors (99% cases),
+		 *   the accumulator type (A) is hidden and not required explicitly.
+		 *
+		 * - It is represented as "?"
+		 *
+		 * ------------------------------------------------------------------------
+		 * WHY IS ACCUMULATOR OFTEN '?' ?
+		 *
+		 * - Java manages the accumulator internally
+		 * - It acts as temporary working memory during collection
+		 * - Developers do NOT interact with it directly
+		 * - It becomes important only when writing CUSTOM collectors
+		 *
+		 * ------------------------------------------------------------------------
+		 * COMMON USAGE PATTERN:
+		 *
+		 * Collector<T, ?, R>
+		 *
+		 * Example:
+		 *      Collector<Student, ?, Long> using Collectors.counting()
+		 *
+		 * ------------------------------------------------------------------------
+		 * SUMMARY:
+		 *
+		 * - T → Input type
+		 * - ? → Internal accumulator (hidden by Java)
+		 * - R → Output / result type
+		 *
+		 * ========================================================================
+		 */
+		Collector<Student, ?, Long> countStudents = Collectors
+				.counting();
+
+		Map<String, Long> student_count = studentsList
+				.stream()
+				.collect(Collectors
+						.groupingBy(groupBy_Name_type_2, countStudents));
+
+		System.out
+				.println("---------- Type - 2 ::: .groupingBy(Func_Classifier, Collectors.** )  ------------");
+		System.out
+				.println(student_count);
+
+		/*
+		 * ========================= GROUPING - TYPE 3 =========================
+		 *
+		 * ADVANCED GROUPING WITH CUSTOM MAP IMPLEMENTATION
+		 *
+		 * ----------------------------------------------------------------------
+		 * BASIC IDEA:
+		 *
+		 * - Used when you want full control over:
+		 *      1. How data is grouped (keyExtractor)
+		 *      2. How values are processed (downstream collector)
+		 *      3. Which Map implementation is used (mapFactory)
+		 *
+		 * ----------------------------------------------------------------------
+		 * SIGNATURE:
+		 *
+		 * groupingBy(Function<T, K>, Supplier<Map>, Collector<T, A, D>)
+		 *
+		 * ----------------------------------------------------------------------
+		 * PARAMETERS:
+		 *
+		 * 1. keyExtractor (Function<T, K>)
+		 *      - Extracts the grouping key
+		 *      - Defines how elements are classified into groups
+		 *
+		 * 2. mapFactory (Supplier<Map>)
+		 *      - Controls the concrete Map implementation
+		 *      - Allows customization of result container
+		 *
+		 *      Examples:
+		 *          HashMap        → default unordered map
+		 *          LinkedHashMap  → preserves insertion order
+		 *          TreeMap        → sorted keys
+		 *          ConcurrentMap  → thread-safe map
+		 *
+		 * 3. downstream (Collector)
+		 *      - Defines how grouped values are processed
+		 *      - Transforms List<T> into another result type (D)
+		 *
+		 *      Examples:
+		 *          counting()
+		 *          averagingDouble()
+		 *          mapping()
+		 *          summarizingDouble()
+		 *          maxBy()
+		 *
+		 * ----------------------------------------------------------------------
+		 * FLOW:
+		 *
+		 * Input   : List<T>
+		 * Stream  : Stream<T>
+		 * Step 1  : Extract key using keyExtractor → K
+		 * Step 2  : Group elements into Map using mapFactory
+		 * Step 3  : Apply downstream collector on each group
+		 *
+		 * ----------------------------------------------------------------------
+		 * RESULT:
+		 *
+		 * Map<K, D>
+		 *
+		 * where:
+		 *      K → Key type from classifier
+		 *      D → Result type from downstream collector
+		 *
+		 * ----------------------------------------------------------------------
+		 * KEY INSIGHT:
+		 *
+		 * - groupingBy() ALWAYS returns a Map
+		 * - mapFactory controls ONLY the Map implementation, not logic
+		 * - downstream controls VALUE transformation
+		 * - keyExtractor controls grouping logic
+		 *
+		 * ======================================================================
 		 */
 
 		/**
@@ -367,7 +669,7 @@ public class Collectors_Full {
 		 *
 		 *	-	“Use Student name as the grouping key”
 		 */
-		Function<Student, String> name_classifier_type_2 = o -> o
+		Function<Student, String> name_classifier_type_3 = o -> o
 				.getName();
 
 		/**
@@ -384,22 +686,171 @@ public class Collectors_Full {
 		 * 
 		 * 		.mapping( @Function_for_Value, What_to_do)
 		 */
-		Function<Student, Double> gpa_val = o -> o
-				.getGpa();
-
 		Collector<Student, ?, List<Double>> downStream = Collectors
-				.mapping(gpa_val, Collectors
-						.toList());
+				.mapping(o -> o
+						.getGpa(), Collectors
+								.toList());
 
 		Map<String, List<Double>> groupBy_Name = studentsList
 				.stream()
 				.collect(Collectors
-						.groupingBy(name_classifier_type_2, which_map_to_use, downStream));
+						.groupingBy(name_classifier_type_3, which_map_to_use, downStream));
 
 		System.out
-				.println("---------- Type - 2 ::: .groupingBy(Func_Classifier, Supp_mapFactory, ds)  ------------");
+				.println(
+						"---------- Type - 3 ::: .groupingBy(Func_Classifier, Supp_mapFactory, Downstream)  ------------");
 		System.out
 				.println(groupBy_Name);
+
+	}
+
+	public static void partitioningBy_method_object_stream() {
+
+		/**
+		 * ========================= PARTITIONING IN STREAMS =========================
+		 *
+		 * WHAT IS PARTITIONING?
+		 * ---------------------
+		 * Partitioning is a special type of stream collection that divides data
+		 * into exactly TWO groups based on a condition.
+		 *
+		 * Unlike groupingBy(), which can create multiple groups,
+		 * partitioning always produces only:
+		 *      - TRUE group
+		 *      - FALSE group
+		 *
+		 * ------------------------------------------------------------------------
+		 * EXAMPLES:
+		 *
+		 * - Students based on Gender (male / female)
+		 * - Students based on GPA threshold ( > 3.8 and <= 3.8 )
+		 *
+		 * ------------------------------------------------------------------------
+		 * INPUT / OUTPUT MODEL:
+		 *
+		 * Input  : Stream<T>
+		 * Process: Evaluate each element using a Predicate<T>
+		 * Output : Map<Boolean, ...>
+		 *
+		 * ------------------------------------------------------------------------
+		 * TYPES OF partitioningBy:
+		 *
+		 * 1. partitioningBy( @Predicate<T> )
+		 *
+		 *      - Splits elements based on a condition
+		 *      - Produces two groups: true and false
+		 *
+		 *      Output:
+		 *          Map<Boolean, List<T>>
+		 *
+		 * ------------------------------------------------------------------------
+		 *
+		 * 2. partitioningBy( @Predicate<T>, @Collector downstream)
+		 *
+		 *      - Splits elements into two groups
+		 *      - Applies a downstream collector to each group
+		 *
+		 *      Output:
+		 *          Map<Boolean, D>
+		 *
+		 *      Example downstream collectors:
+		 *          counting()
+		 *          averagingDouble()
+		 *          mapping()
+		 *          summarizingDouble()
+		 *
+		 * ------------------------------------------------------------------------
+		 * KEY INSIGHT:
+		 *
+		 * - partitioningBy ALWAYS creates exactly two partitions
+		 * - Keys are always Boolean (true / false)
+		 * - Value type depends on whether downstream collector is used
+		 *
+		 * ========================================================================
+		 */
+
+		/*
+		 * Type 1: partitioningBy( @Predicate<T> )
+		 * 
+		 * Note: Result is always @Map<Boolean, List<T>>
+		 */
+		Predicate<Student> isMale = o -> o
+				.getGender()
+				.equals("male");
+
+		Map<Boolean, List<Student>> splitted_gender = studentsList
+				.stream()
+				.collect(Collectors
+						.partitioningBy(isMale));
+
+		System.out
+				.println("---------- Type - 1 ::: .partitioningBy( @Predicate<T> )  ------------");
+		System.out
+				.println(splitted_gender);
+
+		/*
+		 * ========================= PARTITIONING - TYPE 2 =========================
+		 *
+		 * partitioningBy(Predicate<T>, Collector downstream)
+		 *
+		 * ------------------------------------------------------------------------
+		 * PURPOSE:
+		 *
+		 * - Splits stream elements into TWO groups (true / false)
+		 * - Applies a downstream collector to each partition
+		 * - Transforms default List<T> into a custom result type (D)
+		 *
+		 * ------------------------------------------------------------------------
+		 * NOTE:
+		 *
+		 * - Result type is always:
+		 *          Map<Boolean, D>
+		 *
+		 * - Where:
+		 *          Boolean → result of Predicate (true / false)
+		 *          D       → output type of downstream collector
+		 *
+		 * ------------------------------------------------------------------------
+		 * OBJECTIVE (EXAMPLE):
+		 *
+		 * Gender → List<String> (Student Names)
+		 *
+		 * Steps:
+		 *      1. Partition students by gender (male / female)
+		 *      2. Transform Student → Student Name
+		 *      3. Collect names into List<String>
+		 *
+		 * ------------------------------------------------------------------------
+		 * KEY INSIGHT:
+		 *
+		 * - partitioningBy ALWAYS creates exactly 2 groups
+		 * - Key is always Boolean
+		 * - Value type is controlled by downstream collector
+		 * - Predicate decides grouping logic (true/false split)
+		 *
+		 * ========================================================================
+		 */
+		Predicate<Student> isMale_downstream = o -> o
+				.getGender()
+				.equals("male");
+
+		// Final-Map-Value Type : List<String>!
+		Function<Student, String> stud_name = o -> o
+				.getName();
+		Collector<Student, ?, List<String>> list_of_name_collector = Collectors
+				.mapping(stud_name, Collectors
+						.toList());
+
+		Map<Boolean, List<String>> result = studentsList
+				.stream()
+				.collect(Collectors
+						.partitioningBy(isMale_downstream, list_of_name_collector));
+
+		System.out
+				.println(
+						"---------- Type - 2 ::: .partitioningBy( @Predicate<T>, @Collectors downstream )  ------------");
+		System.out
+				.println(result);
 
 	}
 
