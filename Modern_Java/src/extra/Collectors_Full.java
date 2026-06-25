@@ -1,10 +1,12 @@
 package extra;
 
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BinaryOperator;
@@ -18,94 +20,202 @@ import section_7.data.Student;
 import section_7.data.StudentDataBase;
 
 /**
- * ========================= COLLECTORS OVERVIEW =========================
- *
- * WHAT IS Collectors?
- * --------------------
- * Collectors is a utility (helper) class in Java Stream API that provides
- * predefined implementations of the Collector interface.
- *
- * It is used to accumulate stream elements into a final data structure.
- *
- * ----------------------------------------------------------------------
- * KEY CHARACTERISTICS:
- *
- * - Utility class with only static methods
- * - Cannot be instantiated
- * - Provides reusable Collector implementations
- * - Works with Stream.collect()
- *
- * ----------------------------------------------------------------------
- * WHY DO WE NEED IT?
- *
- * Collectors are used to transform and consolidate Stream data into
- * meaningful results.
- *
- * Common output forms include:
- *
- *      - List
- *      - Set
- *      - Map
- *      - String
- *      - Numeric results (count, average, sum, etc.)
- *
- * ----------------------------------------------------------------------
- * MAJOR CATEGORIES OF COLLECTORS:
- *
- * 1. COLLECTION CREATION
- *      - Convert Stream → Collection
- *      - Examples:
- *          toList()
- *          toSet()
- *          toCollection()
- *
- * 2. MAP CREATION
- *      - Convert Stream → Map
- *      - Examples:
- *          toMap()
- *          groupingBy()
- *          partitioningBy()
- *
- * 3. GROUPING
- *      - Classify elements into groups
- *      - Example:
- *          groupingBy()
- *
- * 4. PARTITIONING
- *      - Split data into two groups (true/false)
- *      - Example:
- *          partitioningBy()
- *
- * 5. AGGREGATION / STATISTICS
- *      - Perform numeric calculations
- *      - Examples:
- *          counting()
- *          averagingDouble()
- *          summingInt()
- *          summarizingDouble()
- *
- * 6. STRING JOINING
- *      - Combine elements into a single String
- *      - Example:
- *          joining()
- *
- * 7. REDUCTION
- *      - Reduce stream into a single result
- *      - Examples:
- *          reducing()
- *          maxBy()
- *          minBy()
- *
- * 8. DOWNSTREAM / TRANSFORMATION COLLECTORS
- *      - Used inside groupingBy / partitioningBy
- *      - Transforms grouped values
- *      - Examples:
- *          mapping()
- *          filtering()
- *          collectingAndThen()
- *
- * ======================================================================
- */
+* ========================= COLLECTORS OVERVIEW =========================
+*
+* WHAT IS Collectors?
+* --------------------
+* Collectors is a utility (helper) class in Java Stream API that provides
+* predefined implementations of the Collector interface.
+*
+* It is used to accumulate stream elements into a final data structure.
+*
+* ----------------------------------------------------------------------
+* KEY CHARACTERISTICS:
+*
+* - Utility class with only static methods
+* - Cannot be instantiated
+* - Provides reusable Collector implementations
+* - Works with Stream.collect()
+*
+* ----------------------------------------------------------------------
+* WHY DO WE NEED IT?
+*
+* Collectors are used to transform and consolidate Stream data into
+* meaningful results.
+*
+* Common output forms:
+*      List, Set, Map, String, Numbers, Statistics
+*
+* ======================================================================
+* MAJOR CATEGORIES OF COLLECTORS (WITH OVERLOADS - JAVA 21)
+* ======================================================================
+*
+* 1. COLLECTION CREATION
+* ----------------------------------------------------------------------
+*
+* toList()
+*      - toList()
+*
+* toSet()
+*      - toSet()
+*
+* toCollection()
+*      - toCollection(Supplier<C> collectionFactory)
+*
+* IMMUTABLE COLLECTIONS:
+*      toUnmodifiableList()
+*          - toUnmodifiableList()
+*
+*      toUnmodifiableSet()
+*          - toUnmodifiableSet()
+*
+*      toUnmodifiableMap()
+*          - toUnmodifiableMap(keyMapper, valueMapper)
+*          - toUnmodifiableMap(keyMapper, valueMapper, mergeFunction)
+*
+* ----------------------------------------------------------------------
+*
+* 2. MAP CREATION
+* ----------------------------------------------------------------------
+*
+* toMap() OVERLOADS:
+*      - toMap(keyMapper, valueMapper)
+*      - toMap(keyMapper, valueMapper, mergeFunction)
+*      - toMap(keyMapper, valueMapper, mergeFunction, mapFactory)
+*
+* toConcurrentMap() OVERLOADS:
+*      - toConcurrentMap(keyMapper, valueMapper)
+*      - toConcurrentMap(keyMapper, valueMapper, mergeFunction)
+*      - toConcurrentMap(keyMapper, valueMapper, mergeFunction, mapFactory)
+*
+* ----------------------------------------------------------------------
+*
+* 3. GROUPING
+* ----------------------------------------------------------------------
+*
+* groupingBy() OVERLOADS:
+*      - groupingBy(classifier)
+*      - groupingBy(classifier, downstream)
+*      - groupingBy(classifier, mapFactory, downstream)
+*
+* groupingByConcurrent() OVERLOADS:
+*      - groupingByConcurrent(classifier)
+*      - groupingByConcurrent(classifier, downstream)
+*      - groupingByConcurrent(classifier, mapFactory, downstream)
+*
+* ----------------------------------------------------------------------
+*
+* 4. PARTITIONING
+* ----------------------------------------------------------------------
+*
+* partitioningBy() OVERLOADS:
+*      - partitioningBy(predicate)
+*      - partitioningBy(predicate, downstream)
+*
+* OUTPUT ALWAYS:
+*      Map<Boolean, T> OR Map<Boolean, D>
+*
+* ----------------------------------------------------------------------
+*
+* 5. AGGREGATION / STATISTICS
+* ----------------------------------------------------------------------
+*
+* counting()
+*      - counting()
+*
+* minBy()
+*      - minBy(Comparator comparator)
+*
+* maxBy()
+*      - maxBy(Comparator comparator)
+*
+* averagingInt()
+*      - averagingInt(ToIntFunction mapper)
+*
+* averagingLong()
+*      - averagingLong(ToLongFunction mapper)
+*
+* averagingDouble()
+*      - averagingDouble(ToDoubleFunction mapper)
+*
+* summarizingInt()
+*      - summarizingInt(ToIntFunction mapper)
+*
+* summarizingLong()
+*      - summarizingLong(ToLongFunction mapper)
+*
+* summarizingDouble()
+*      - summarizingDouble(ToDoubleFunction mapper)
+*
+* ----------------------------------------------------------------------
+*
+* 6. STRING JOINING
+* ----------------------------------------------------------------------
+*
+* joining() OVERLOADS:
+*      - joining()
+*      - joining(CharSequence delimiter)
+*      - joining(CharSequence delimiter,
+*                CharSequence prefix,
+*                CharSequence suffix)
+*
+* ----------------------------------------------------------------------
+*
+* 7. REDUCTION
+* ----------------------------------------------------------------------
+*
+* reducing() OVERLOADS:
+*      - reducing(BinaryOperator<T> op)
+*      - reducing(T identity, BinaryOperator<T> op)
+*      - reducing(U identity,
+*                 Function<T,U> mapper,
+*                 BinaryOperator<U> op)
+*
+* ----------------------------------------------------------------------
+*
+* 8. TRANSFORMATION / DOWNSTREAM COLLECTORS
+* ----------------------------------------------------------------------
+*
+* mapping()
+*      - mapping(Function<T,U> mapper,
+*               Collector<U,A,R> downstream)
+*
+* filtering() (Java 9+)
+*      - filtering(Predicate<T> predicate,
+*                 Collector<T,A,R> downstream)
+*
+* flatMapping() (Java 9+)
+*      - flatMapping(Function<T,Stream<U>> mapper,
+*                    Collector<U,A,R> downstream)
+*
+* collectingAndThen()
+*      - collectingAndThen(Collector<T,A,R> downstream,
+*                         Function<R,RR> finisher)
+*
+* ----------------------------------------------------------------------
+*
+* 9. ADVANCED COMBINER
+* ----------------------------------------------------------------------
+*
+* teeing() (Java 12+)
+*      - teeing(Collector<T,?,R1> c1,
+*               Collector<T,?,R2> c2,
+*               BiFunction<R1,R2,R> merger)
+*
+* ----------------------------------------------------------------------
+*
+* SUMMARY:
+* ----------------------------------------------------------------------
+* Collectors = Stream final-stage transformation toolkit:
+*      - Collection creation
+*      - Map creation
+*      - Grouping / Partitioning
+*      - Aggregation
+*      - Reduction
+*      - Transformation
+*
+* ======================================================================
+*/
 public class Collectors_Full {
 
 	public static List<Student> studentsList = StudentDataBase
@@ -135,13 +245,301 @@ public class Collectors_Full {
 		Collection_Creation_methods();
 
 		/**
-		 * 2.	Map Creation Methods
-		 * 
-		 * 	-	.toMap()
-		 * 			
-		 * 	-	.toConcurrentMap()
+		 * 2. MAP CREATION
 		 */
 		Map_Creation_methods();
+
+		/**
+		 * 8. TRANSFORMATION / DOWNSTREAM COLLECTORS
+		 */
+		transform_downstream_methods();
+
+		/**
+		 * 5. AGGREGATION / STATISTICS
+		 */
+		aggregation_stat_methods();
+
+		/**
+		 * 7. REDUCTION
+		 */
+		reduction_methods();
+
+		/**
+		 * 6. STRING JOINING
+		 */
+		joining_methods();
+	}
+
+	private static void joining_methods() {
+
+		/**
+		 * 	-	()
+		 * 	-	(delimiter)
+		 * 	-	(delimiter, prefix, suffix)
+		 */
+
+		/**
+		 * 1
+		 */
+		String join_no_delimiter = studentsList
+				.stream()
+				.map(Student::getName)
+				.collect(Collectors
+						.joining());
+		System.out
+				.println("----------- Collectors.joining() -----------");
+		System.out
+				.println(join_no_delimiter);
+
+		/**
+		 * 2
+		 */
+		String join_comma_delimieter = studentsList
+				.stream()
+				.map(Student::getName)
+				.collect(Collectors
+						.joining(","));
+
+		System.out
+				.println("----------- Collectors.joining(delimieter) -----------");
+		System.out
+				.println(join_comma_delimieter);
+
+		/**
+		 * 3
+		 */
+		String join_prefix_comma_suffix = studentsList
+				.stream()
+				.map(Student::getName)
+				.collect(Collectors
+						.joining(",", "<", ">"));
+
+		System.out
+				.println("----------- Collectors.joining(delimieter, prefix, suffix) -----------");
+		System.out
+				.println(join_prefix_comma_suffix);
+
+	}
+
+	private static void reduction_methods() {
+
+		/**
+		 * 	Important : @.reduce() must return the same type as stream element
+		 * 
+		 *      - ( @BinaryOperator<T> op)
+		 *      - ( @T identity, @BinaryOperator<T> op)
+		 *      - ( @U identity, @Function<T,U> mapper, @BinaryOperator<U> op)
+		 */
+
+		/**
+		 * 1
+		 */
+		Optional<Double> sum_1 = studentsList
+				.stream()
+				.map(o -> o
+						.getGpa())
+				.collect(Collectors
+						.reducing((a, b) -> a + b));
+
+		System.out
+				.println("----------- Collectors.reducing( @BinaryOperator ) -----------");
+		System.out
+				.println(sum_1
+						.get());
+
+		/**
+		 * 2	:	This approach is to 
+		 * 				-	sets initial-value for the reduction
+		 * 				-	avoid @Optional non-sense !
+		 */
+		Double sum_2 = studentsList
+				.stream()
+				.map(o -> o
+						.getGpa())
+				.collect(Collectors
+						.reducing(0.0, (a, b) -> a + b));
+
+		System.out
+				.println("----------- Collectors.reducing( @T identity, @BinaryOperator<T> op ) -----------");
+		System.out
+				.println(sum_2);
+
+		/**
+		 * 3	:	This approach is to 
+		 * 				-	sets initial-value for the reduction
+		 * 				-	avoid @Optional non-sense !
+		 * 				-	avoid .map() call
+		 */
+		Double sum_3 = studentsList
+				.stream()
+				//				.map(o -> o
+				//						.getGpa())
+				.collect(Collectors
+						.reducing(0.0, o -> o
+								.getGpa(), (a, b) -> a + b));
+
+		System.out
+				.println(
+						"----------- Collectors.reducing( @U identity, @Function<T,U> mapper, @BinaryOperator<U> op ) -----------");
+		System.out
+				.println(sum_3);
+	}
+
+	private static void aggregation_stat_methods() {
+
+		/**
+		 * ========================= 5. AGGREGATION / STATISTICS =========================
+		 *
+		 * PURPOSE:
+		 * - Used to compute single result from stream elements
+		 * - Examples: count, sum, average, min, max, statistics
+		 *
+		 * INPUT  : Stream<T>
+		 * OUTPUT : Single value (Long / Double / Optional<T> / Statistics)
+		 *
+		 * ======================================================================
+		 *
+		 * 1. counting()
+		 * - Counts number of elements
+		 * - Return: Long
+		 *
+		 * 2. minBy() / maxBy()
+		 * - Finds min / max element using Comparator
+		 * - Return: Optional<T>
+		 *
+		 * 3. averagingInt / Long / Double
+		 * - Calculates average of numeric values
+		 * - Return: Double
+		 *
+		 * 4. summingInt / Long / Double
+		 * - Calculates sum of values
+		 * - Return: primitive number (int/long/double)
+		 *
+		 * 5. summarizingInt / Long / Double
+		 * - Gives full stats (count, sum, min, max, avg)
+		 * - Return: SummaryStatistics object
+		 *
+		 * 6. reducing()
+		 * - Custom aggregation logic
+		 * - Return: Optional<T> or custom result
+		 *
+		 * ======================================================================
+		 *
+		 * KEY IDEA:
+		 * - Converts many elements → one result
+		 * - Used for analytics, reporting, calculations
+		 *
+		 * ======================================================================
+		 */
+
+		counting_from_stream_object();
+		minBy_maxby_from_stream_object();
+		averageDouble_from_stream_object();
+		summingDouble_from_stream_object();
+		summarizingDouble_from_stream_object();
+
+	}
+
+	private static void summarizingDouble_from_stream_object() {
+
+		DoubleSummaryStatistics double_stat = studentsList
+				.stream()
+				.collect(Collectors
+						.summarizingDouble(o -> o
+								.getGpa()));
+
+		System.out
+				.println("----------- Collectors.summarizingDouble( @Function ) -----------");
+		System.out
+				.println("Count : " + double_stat
+						.getCount());
+		System.out
+				.println("Max : " + double_stat
+						.getMax());
+		System.out
+				.println("Min : " + double_stat
+						.getMin());
+	}
+
+	private static void summingDouble_from_stream_object() {
+
+		Double total_gpa_class = studentsList
+				.stream()
+				.collect(Collectors
+						.summingDouble(o -> o
+								.getGpa()));
+
+		System.out
+				.println("----------- Collectors.summingDouble( @Function ) -----------");
+		System.out
+				.println(total_gpa_class);
+
+	}
+
+	private static void averageDouble_from_stream_object() {
+
+		Double avg_gpa_class = studentsList
+				.stream()
+				.collect(Collectors
+						.averagingDouble(o -> o
+								.getGpa()));
+
+		System.out
+				.println("----------- Collectors.averagingDouble( @Function ) -----------");
+		System.out
+				.println(avg_gpa_class);
+
+	}
+
+	private static void minBy_maxby_from_stream_object() {
+
+		Comparator<Student> min_max_comparator = (o1, o2) -> Double
+				.compare(o1
+						.getGpa(),
+						o2
+								.getGpa());
+
+		Optional<Student> low_gpa_stud = studentsList
+				.stream()
+				.collect(Collectors
+						.minBy(min_max_comparator));
+
+		System.out
+				.println("----------- Collectors.minBy( @Comparator ) -----------");
+		System.out
+				.println(low_gpa_stud
+						.get());
+
+		Optional<Student> high_gpa_stud = studentsList
+				.stream()
+				.collect(Collectors
+						.maxBy(min_max_comparator));
+
+		System.out
+				.println("----------- Collectors.maxBy( @Comparator ) -----------");
+		System.out
+				.println(high_gpa_stud
+						.get());
+
+	}
+
+	private static void counting_from_stream_object() {
+
+		Long count = studentsList
+				.stream()
+				.collect(Collectors
+						.counting());
+
+		System.out
+				.println("----------- Collectors.counting() -----------");
+		System.out
+				.println(count);
+
+	}
+
+	private static void transform_downstream_methods() {
+
+		mapping_method_downstreamm_collector();
 
 	}
 
@@ -394,9 +792,17 @@ public class Collectors_Full {
 		 *
 		 * 1. groupingBy(Function classifier)
 		 *      → Map<K, List<T>>
+		 *      
+		 *      - Eg:
+		 *      		male   → List<Student>
+		 *      		female → List<Student>
 		 *
 		 * 2. groupingBy(Function classifier, Collector downstream)
 		 *      → Map<K, D>   (D depends on downstream collector)
+		 *      
+		 *      - Eg:
+		 *      		male   → [Adam, John]
+		 *      		female → [Jenny, Emily]
 		 *
 		 * 3. groupingBy(Function classifier, Supplier mapFactory, Collector downstream)
 		 *      → Custom Map implementation + Map<K, D>
@@ -852,6 +1258,95 @@ public class Collectors_Full {
 		System.out
 				.println(result);
 
+	}
+
+	public static void mapping_method_downstreamm_collector() {
+
+		/**
+		 * ========================= COLLECTORS.mapping() =========================
+		 *
+		 * .mapping() is a downstream collector used inside other collectors.
+		 *
+		 * ------------------------------------------------------------------------
+		 * PURPOSE:
+		 *
+		 * - Used when data is already being collected (grouped/partitioned)
+		 * - Performs transformation + collection in a single step
+		 *
+		 * ------------------------------------------------------------------------
+		 * SIGNATURE:
+		 *
+		 * Collectors.mapping(Function<T, U>, Collector<U, A, R>)
+		 *
+		 * ------------------------------------------------------------------------
+		 * MEANING:
+		 *
+		 * - Function<T, U>
+		 *      → Transforms each input element (T → U)
+		 *
+		 * - Collector<U, A, R>
+		 *      → Defines how transformed elements are collected
+		 *
+		 * ------------------------------------------------------------------------
+		 * CORE IDEA:
+		 *
+		 * - First transform elements
+		 * - Then collect them using a downstream collector
+		 *
+		 * ------------------------------------------------------------------------
+		 * WHERE IS mapping() USED?
+		 *
+		 * 1. Inside groupingBy()
+		 *      - To transform grouped values
+		 *      - Example: Student → Student Name
+		 *
+		 * 2. Inside partitioningBy()
+		 *      - To transform partitioned values
+		 *      - Example: Student → Student Name / ID / GPA
+		 *
+		 * ------------------------------------------------------------------------
+		 * KEY INSIGHT:
+		 *
+		 * - mapping() is NOT a standalone collector
+		 * - It always works as a helper inside other collectors
+		 * - It avoids extra Stream.map() before collecting
+		 *
+		 * ========================================================================
+		 */
+
+		// Common in this example
+		Collector<Student, ?, List<String>> downstream = Collectors
+				.mapping(Student::getName, Collectors
+						.toList());
+
+		/**
+		 * 	-	groupingBy(..., downstream) example
+		 */
+		Map<String, List<String>> gender_cat_list = studentsList
+				.stream()
+				.collect(Collectors
+						.groupingBy(o -> o
+								.getGender(), downstream));
+
+		System.out
+				.println("---------- Type - 1 ::: .groupingBy(..., downstream) ------------");
+		System.out
+				.println(gender_cat_list);
+
+		/**
+		 * PartitionBy(...., downstream) example
+		 */
+		Map<Boolean, List<String>> male_female = studentsList
+				.stream()
+				.collect(Collectors
+						.partitioningBy(o -> o
+								.getGender()
+								.equals("male"), downstream));
+
+		System.out
+				.println("---------- Type - 2 ::: .partitionBy(..., downstream) ------------");
+		System.out
+				.println(male_female);
 	}
 
 }
